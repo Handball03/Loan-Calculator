@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EMI Calculator</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      border-radius: 5px;
+      border: none;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+    }
+    canvas {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>EMI Calculator</h1>
+    <input type="number" id="principal" placeholder="Principal (₹)" />
+    <input type="number" id="interestRate" placeholder="Interest Rate (%)" />
+    <input type="number" id="tenure" placeholder="Tenure (Months)" />
+    <button onclick="calculateEMI()">Calculate</button>
+    <h2 id="result">Monthly EMI: ₹0.00</h2>
+    <canvas id="pieChart" width="300" height="300"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    function calculateEMI() {
+      const P = parseFloat(document.getElementById('principal').value);
+      const r = parseFloat(document.getElementById('interestRate').value) / 12 / 100;
+      const n = parseInt(document.getElementById('tenure').value);
+
+      const emi = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+      document.getElementById('result').innerText = `Monthly EMI: ₹${emi.toFixed(2)}`;
+
+      const totalPayment = emi * n;
+      const interest = totalPayment - P;
+
+      const ctx = document.getElementById('pieChart').getContext('2d');
+      if (window.pieChart) {
+        window.pieChart.destroy();
+      }
+      window.pieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Principal', 'Interest'],
+          datasets: [{
+            data: [P, interest],
+            backgroundColor: ['#ffffff', '#001f3f'], // White for Principal, Dark Blue for Interest
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#ffffff'
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
